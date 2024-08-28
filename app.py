@@ -1,8 +1,8 @@
-from flask import Flask, request, render_template_string, send_from_directory
+from flask import Flask, request, send_from_directory
+import os
 import requests
 from bs4 import BeautifulSoup
 import markdown
-import os
 
 app = Flask(__name__, static_folder='.')
 
@@ -43,13 +43,12 @@ def generate_html(title, content, url):
     
     return template.replace('$title$', title).replace('$body$', html_content).replace('$source_url$', url)
 
-@app.route('/')
-def index():
-    return send_from_directory('.', 'index.html')
-
+@app.route('/', defaults={'path': ''})
 @app.route('/<path:path>')
-def send_static(path):
-    return send_from_directory('.', path)
+def catch_all(path):
+    if path and os.path.exists(path):
+        return send_from_directory('.', path)
+    return send_from_directory('.', 'index.html')
 
 @app.route('/convert', methods=['POST'])
 def convert():
@@ -59,5 +58,6 @@ def convert():
     result_html = generate_html(title, content, url)
     return result_html
 
-if __name__ == "__main__":
-    app.run(debug=True)
+if __name__ == '__main__':
+    port = int(os.environ.get('PORT', 5000))
+    app.run(host='0.0.0.0', port=port)
