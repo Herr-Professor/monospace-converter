@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Monospace Web Converter</title>
+    <link rel="stylesheet" href="reset.css">
+    <link rel="stylesheet" href="index.css">
+</head>
+<body>
+    <table class="header">
+        <tr>
+            <td colspan="2" rowspan="2" class="width-auto">
+                <h1 class="title">Monospace Web Converter</h1>
+            </td>
+        </tr>
+        <tr>
+            
+            <td class="width-min debug-toggle-label">
+                <label>
+                    <input type="checkbox" class="debug-toggle">
+                    Show grid
+                </label>
+            </td>
+        </tr>
+    </table>
+    <div id="content">
+        <form id="url-form">
+            <label for="url-input">Enter URL to convert:</label>
+            <input type="url" id="url-input" required>
+            <button type="submit">Convert</button>
+        </form>
+        <div id="result"></div>
+    </div>
+    <div class="debug-grid"></div>
+    <script src="index.js"></script>
+    <script>
+        document.getElementById('url-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const url = document.getElementById('url-input').value;
+            fetch('/convert', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+                body: `url=${encodeURIComponent(url)}`
+            })
+            .then(response => response.text())
+            .then(html => {
+                document.getElementById('result').innerHTML = html;
+                adjustMediaPadding();
+                checkOffsets();
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+        });
+    </script>
+    <table class="footer">
+        <tr>
+            <th class="width-min">Designed from: </th>
+            <td class="width-auto"><a href="https://wickstrom.tech"><cite>Oskar Wickström</cite></a></td>
+        </tr>
+    </table>
+</body>
+</html>
